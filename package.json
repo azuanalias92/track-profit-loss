@@ -1,0 +1,23 @@
+{
+  "name": "track-profit-loss",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc --noEmit",
+    "d1:migrate:local": "wrangler d1 migrations apply track-pnl-db --local",
+    "d1:migrate:remote": "wrangler d1 migrations apply track-pnl-db --remote",
+    "d1:execute": "wrangler d1 execute track-pnl-db --remote --command"
+  },
+  "dependencies": {
+    "hono": "^4.7.0",
+    "jose": "^5.9.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250417.0",
+    "typescript": "^5.8.0",
+    "wrangler": "^4.15.0"
+  }
+}

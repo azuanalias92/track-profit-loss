@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "track-profit-loss",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-26",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "GOOGLE_CLIENT_ID": "",
+    "GOOGLE_CLIENT_SECRET": "",
+    "ALLOWED_ORIGINS": "http://localhost:3000,https://track-profit-loss.vercel.app,https://track-profit-loss.pages.dev"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "track-pnl-db",
+      "database_id": "",
+      "migrations_dir": "./migrations"
+    }
+  ]
+}
