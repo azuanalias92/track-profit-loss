@@ -1,7 +1,7 @@
 import type { StoredSession, Trade, PnLSummary, CreateTradeForm } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://track-profit-loss.traone.workers.dev";
-const SESSION_STORAGE_KEY = "track-pnl.session";
+const SESSION_STORAGE_KEY = "traone-profit.session";
 
 // ── Session management ──
 

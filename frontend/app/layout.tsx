@@ -15,8 +15,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Track P&L",
-  description: "Track your trading profit and loss with confidence.",
+  title: "Traone Profit",
+  description: "Traone Profit — track your trading P&L with confidence.",
 };
 
 export default function RootLayout({

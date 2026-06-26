@@ -37,7 +37,7 @@ export function parseCallbackUrl(url: string): {
   ) {
     return {
       type: "error",
-      message: "Track P&L did not receive a complete sign-in response.",
+      message: "Traone Profit did not receive a complete sign-in response.",
     };
   }
 

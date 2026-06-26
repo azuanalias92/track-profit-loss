@@ -5,15 +5,14 @@
   "compatibility_date": "2026-06-26",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
-    "GOOGLE_CLIENT_ID": "",
-    "GOOGLE_CLIENT_SECRET": "",
-    "ALLOWED_ORIGINS": "http://localhost:3000,https://track-profit-loss.vercel.app,https://track-profit-loss.pages.dev"
+    "GOOGLE_CLIENT_ID": "110648759817-vtnohpg7b4095c0pep9ahr1q1h00ubdr.apps.googleusercontent.com",
+    "ALLOWED_ORIGINS": "http://localhost:3000,https://traone-profit.vercel.app,https://traone-profit.pages.dev"
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "track-pnl-db",
-      "database_id": "",
+      "database_id": "85bd0f9e-8aea-401b-9bfd-acebfb051878",
       "migrations_dir": "./migrations"
     }
   ]

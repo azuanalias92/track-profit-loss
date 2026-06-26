@@ -239,7 +239,7 @@ export default function TrackPnlApp() {
             <Loader2 className="h-8 w-8 animate-spin text-neo-orange" />
           </div>
           <h2 className="mt-5 text-2xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>
-            Loading Track P&amp;L
+            Loading Traone Profit
           </h2>
         </div>
       </div>
@@ -267,7 +267,7 @@ export default function TrackPnlApp() {
         </div>
 
         <h1 className="mb-1 text-center text-3xl font-bold text-[#141414]" style={{ fontFamily: "var(--font-heading)" }}>
-          Track P&amp;L
+          Traone Profit
         </h1>
         <h2 className="text-center text-xl font-bold text-[#141414]" style={{ fontFamily: "var(--font-heading)" }}>
           Track your trading profit &amp; loss with confidence.
@@ -297,13 +297,13 @@ export default function TrackPnlApp() {
           <div className="mt-4 flex items-center gap-2.5">
             <Loader2 className="h-4 w-4 animate-spin text-neo-blue" />
             <p className="text-xs text-[#64748b]">
-              Finish Google sign-in in your browser. Track P&amp;L will reopen automatically.
+              Finish Google sign-in in your browser. Traone Profit will reopen automatically.
             </p>
           </div>
         )}
 
         <p className="mx-auto mt-4 max-w-xs text-center text-xs text-[#64748b]">
-          Google sign-in opens in your browser and returns to Track P&amp;L when it finishes.
+          Google sign-in opens in your browser and returns to Traone Profit when it finishes.
         </p>
       </div>
     );
@@ -320,7 +320,7 @@ export default function TrackPnlApp() {
               className="text-xs font-bold uppercase tracking-wider text-neo-orange"
               style={{ fontFamily: "var(--font-heading)" }}
             >
-              Track P&amp;L
+              Traone Profit
             </p>
             <h1 className="mt-1 text-xl font-bold text-[#141414]" style={{ fontFamily: "var(--font-heading)" }}>
               Trading Dashboard
