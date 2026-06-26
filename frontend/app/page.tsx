@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Trade, CreateTradeForm, StoredSession, PnLSummary, MonthlyPnL } from "@/lib/types";
 import {
   getSession,
@@ -54,6 +54,8 @@ export default function TrackPnlApp() {
   const [form, setForm] = useState<CreateTradeForm>(defaultForm());
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"trades" | "positions" | "closed">("trades");
+  const [swipedId, setSwipedId] = useState<string | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   // ── Bootstrap ──
   useEffect(() => {
@@ -463,71 +465,83 @@ export default function TrackPnlApp() {
                   </p>
                 </div>
               ) : (
-                trades.map((trade) => (
-                  <div key={trade.id} className="neo-card p-4">
-                    <div className="flex items-start justify-between gap-2.5">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p
-                            className="text-base font-bold text-[#141414] truncate"
-                            style={{ fontFamily: "var(--font-heading)" }}
-                          >
-                            {trade.symbol}
-                          </p>
-                          <span
-                            className={`neo-badge ${
-                              trade.side === "buy" ? "neo-badge-buy" : "neo-badge-sell"
-                            }`}
-                          >
-                            {trade.side.toUpperCase()}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-xs text-[#64748b] truncate">
-                          {formatDate(trade.trade_date)} · {trade.quantity} @ {formatCurrency(trade.price)}
-                          {trade.notes ? ` · ${trade.notes}` : ""}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1">
+                <SwipeList listRef={listRef} swipedId={swipedId} setSwipedId={setSwipedId}>
+                  {trades.map((trade) => {
+                    const isOpen = swipedId === trade.id;
+                    return (
+                      <SwipeableCard
+                        key={trade.id}
+                        commitmentId={trade.id}
+                        isOpen={isOpen}
+                        onOpen={() => setSwipedId(trade.id)}
+                        onClose={() => setSwipedId(null)}
+                        actions={
+                          <>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); openEditModal(trade); }}
+                              className="neo-btn neo-btn-primary flex items-center gap-1.5 px-4 py-2 text-sm"
+                            >
+                              <Pencil className="h-4 w-4" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDelete(trade); }}
+                              className="neo-btn neo-btn-red flex items-center gap-1.5 px-4 py-2 text-sm"
+                              style={{ boxShadow: "4px 4px 0 #141414" }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </>
+                        }
+                      >
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditModal(trade);
-                          }}
-                          className="neo-btn neo-btn-primary p-2"
-                          style={{ boxShadow: "2px 2px 0 #141414" }}
+                          onClick={() => { if (isOpen) setSwipedId(null); }}
+                          className="w-full text-left neo-card p-4"
                         >
-                          <Pencil className="h-3.5 w-3.5" />
+                          <div className="flex items-start justify-between gap-2.5">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p
+                                  className="text-base font-bold text-[#141414] truncate"
+                                  style={{ fontFamily: "var(--font-heading)" }}
+                                >
+                                  {trade.symbol}
+                                </p>
+                                <span
+                                  className={`neo-badge ${
+                                    trade.side === "buy" ? "neo-badge-buy" : "neo-badge-sell"
+                                  }`}
+                                >
+                                  {trade.side.toUpperCase()}
+                                </span>
+                              </div>
+                              <p className="mt-1 text-xs text-[#64748b] truncate">
+                                {formatDate(trade.trade_date)} · {trade.quantity} @ {formatCurrency(trade.price)}
+                                {trade.notes ? ` · ${trade.notes}` : ""}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-3 gap-2">
+                            <div>
+                              <p className="text-xs text-[#64748b]">Qty</p>
+                              <p className="text-sm font-bold text-[#141414]">{trade.quantity}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#64748b]">Price</p>
+                              <p className="text-sm font-bold text-[#141414]">{formatCurrency(trade.price)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#64748b]">Total</p>
+                              <p className="text-sm font-bold text-[#141414]">
+                                {formatCurrency(trade.quantity * trade.price + trade.commission)}
+                              </p>
+                            </div>
+                          </div>
                         </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(trade);
-                          }}
-                          className="neo-btn neo-btn-red p-2"
-                          style={{ boxShadow: "2px 2px 0 #141414" }}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="mt-3 grid grid-cols-3 gap-2">
-                      <div>
-                        <p className="text-xs text-[#64748b]">Qty</p>
-                        <p className="text-sm font-bold text-[#141414]">{trade.quantity}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#64748b]">Price</p>
-                        <p className="text-sm font-bold text-[#141414]">{formatCurrency(trade.price)}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#64748b]">Total</p>
-                        <p className="text-sm font-bold text-[#141414]">
-                          {formatCurrency(trade.quantity * trade.price + trade.commission)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))
+                      </SwipeableCard>
+                    );
+                  })}
+                </SwipeList>
               )}
             </>
           )}
@@ -791,6 +805,138 @@ export default function TrackPnlApp() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Swipeable list components ──
+
+const SWIPE_THRESHOLD = 80;
+const SWIPE_VELOCITY_THRESHOLD = 0.4;
+
+function SwipeList({
+  children,
+  swipedId,
+  setSwipedId,
+  listRef,
+}: {
+  children: React.ReactNode;
+  swipedId: string | null;
+  setSwipedId: (id: string | null) => void;
+  listRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (listRef.current && !listRef.current.contains(e.target as Node)) {
+        setSwipedId(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [listRef, setSwipedId]);
+
+  return (
+    <div ref={listRef} className="mt-3 space-y-3">
+      {children}
+    </div>
+  );
+}
+
+function SwipeableCard({
+  children,
+  commitmentId,
+  isOpen,
+  onOpen,
+  onClose,
+  actions,
+}: {
+  children: React.ReactNode;
+  commitmentId: string;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  actions: React.ReactNode;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const startX = useRef(0);
+  const currentX = useRef(0);
+  const dragging = useRef(false);
+  const [offset, setOffset] = useState(0);
+  const wasOpen = useRef(false);
+  const actionsWidth = useRef(160);
+
+  useEffect(() => {
+    if (isOpen) {
+      const el = cardRef.current;
+      if (el) {
+        const actionsEl = el.querySelector("[data-actions]") as HTMLElement;
+        if (actionsEl) actionsWidth.current = actionsEl.offsetWidth;
+      }
+      setOffset(-actionsWidth.current);
+    } else {
+      setOffset(0);
+    }
+  }, [isOpen]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+    dragging.current = true;
+    wasOpen.current = isOpen;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!dragging.current) return;
+    currentX.current = e.touches[0].clientX;
+    const diff = currentX.current - startX.current;
+
+    if (wasOpen.current) {
+      setOffset(Math.min(0, -actionsWidth.current + diff));
+    } else {
+      setOffset(Math.min(0, Math.max(-actionsWidth.current * 1.3, diff)));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const diff = currentX.current - startX.current;
+
+    if (wasOpen.current) {
+      if (diff > SWIPE_THRESHOLD) {
+        onClose();
+      } else {
+        onOpen();
+      }
+    } else {
+      if (diff < -SWIPE_THRESHOLD) {
+        onOpen();
+      } else {
+        onClose();
+      }
+    }
+  };
+
+  return (
+    <div className="relative overflow-hidden" ref={cardRef}>
+      <div
+        data-actions
+        className="absolute inset-y-0 right-0 z-0 flex items-center gap-2 px-4"
+        style={{
+          backgroundColor: "rgba(255, 107, 53, 0.1)",
+          border: "3px solid #141414",
+        }}
+      >
+        {actions}
+      </div>
+      <div
+        className="relative z-10 transition-transform duration-200 ease-out"
+        style={{ transform: `translateX(${offset}px)` }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {children}
+      </div>
     </div>
   );
 }
