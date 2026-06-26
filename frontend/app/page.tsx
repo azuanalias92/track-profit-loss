@@ -652,7 +652,7 @@ export default function TrackPnlApp() {
           onClick={closeModal}
         >
           <div
-            className="neo-modal w-full max-w-md p-5 animate-neo-slide-up"
+            className="neo-modal w-full max-w-md p-5 animate-neo-slide-up max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-start justify-between">

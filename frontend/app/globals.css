@@ -191,6 +191,18 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 8px 8px 0 #141414;
 }
 
+/* Fix date input on mobile — prevent iOS Safari clipping */
+input[type="date"].neo-input {
+  -webkit-appearance: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.neo-input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
 .neo-error {
   background-color: #FEF2F2;
   border: 3px solid #141414;
