@@ -1,4 +1,4 @@
-import type { StoredSession, Trade, PnLSummary, CreateTradeForm } from "./types";
+import type { StoredSession, Trade, PnLSummary, CreateTradeForm, MonthlyPnL } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://track-profit-loss.traone.workers.dev";
 const SESSION_STORAGE_KEY = "traone-profit.session";
@@ -133,4 +133,8 @@ export async function deleteTrade(id: string): Promise<void> {
 
 export async function fetchSummary(): Promise<PnLSummary> {
   return apiRequest<PnLSummary>("/summary");
+}
+
+export async function fetchMonthlyPnL(): Promise<MonthlyPnL[]> {
+  return apiRequest<MonthlyPnL[]>("/summary/monthly");
 }

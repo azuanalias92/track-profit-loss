@@ -106,4 +106,62 @@ summary.get("/", async (c) => {
   } satisfies PnLSummary);
 });
 
+// GET /summary/monthly — realized P&L grouped by month
+summary.get("/monthly", async (c) => {
+  const userId = c.get("userId") as string;
+
+  const { results } = await c.env.DB.prepare(
+    "SELECT * FROM trades WHERE user_id = ?1 ORDER BY trade_date ASC, created_at ASC"
+  )
+    .bind(userId)
+    .all<Trade>();
+
+  const trades = results || [];
+
+  // Group by symbol for FIFO
+  const bySymbol = new Map<string, Trade[]>();
+  for (const t of trades) {
+    const group = bySymbol.get(t.symbol) || [];
+    group.push(t);
+    bySymbol.set(t.symbol, group);
+  }
+
+  // Monthly P&L map: "YYYY-MM" -> total realized P&L
+  const monthly: Map<string, number> = new Map();
+
+  for (const [, symbolTrades] of bySymbol) {
+    const buyLots: { quantity: number; price: number }[] = [];
+
+    for (const trade of symbolTrades) {
+      if (trade.side === "buy") {
+        buyLots.push({ quantity: trade.quantity, price: trade.price });
+      } else {
+        let remainingSell = trade.quantity;
+        const month = trade.trade_date.slice(0, 7); // "YYYY-MM"
+
+        while (remainingSell > 0 && buyLots.length > 0) {
+          const lot = buyLots[0];
+          const matchedQty = Math.min(remainingSell, lot.quantity);
+          const pnl = (trade.price - lot.price) * matchedQty
+            - trade.commission * (matchedQty / trade.quantity);
+
+          const prev = monthly.get(month) || 0;
+          monthly.set(month, Math.round((prev + pnl) * 100) / 100);
+
+          lot.quantity -= matchedQty;
+          remainingSell -= matchedQty;
+          if (lot.quantity <= 0) buyLots.shift();
+        }
+      }
+    }
+  }
+
+  // Sort by month ascending
+  const data = Array.from(monthly.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, pnl]) => ({ month, pnl }));
+
+  return c.json(data);
+});
+
 export default summary;

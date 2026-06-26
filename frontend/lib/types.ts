@@ -63,3 +63,8 @@ export interface ClosedTrade {
   pnl: number;
   pnlPercent: number;
 }
+
+export interface MonthlyPnL {
+  month: string;   // "YYYY-MM"
+  pnl: number;
+}

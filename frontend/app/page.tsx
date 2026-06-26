@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Trade, CreateTradeForm, StoredSession, PnLSummary } from "@/lib/types";
+import type { Trade, CreateTradeForm, StoredSession, PnLSummary, MonthlyPnL } from "@/lib/types";
 import {
   getSession,
   setSession,
@@ -10,9 +10,11 @@ import {
   updateTrade,
   deleteTrade,
   fetchSummary,
+  fetchMonthlyPnL,
   apiRequest,
 } from "@/lib/api";
 import { buildGoogleAuthUrl, parseCallbackUrl } from "@/lib/auth";
+import MonthlyChart from "@/components/MonthlyChart";
 import {
   Loader2,
   Plus,
@@ -41,6 +43,7 @@ export default function TrackPnlApp() {
   const [session, setSessionState] = useState<StoredSession | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [summary, setSummary] = useState<PnLSummary | null>(null);
+  const [monthlyPnL, setMonthlyPnL] = useState<MonthlyPnL[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
@@ -96,6 +99,7 @@ export default function TrackPnlApp() {
     if (!session) {
       setTrades([]);
       setSummary(null);
+      setMonthlyPnL([]);
       return;
     }
     refreshData();
@@ -105,9 +109,14 @@ export default function TrackPnlApp() {
     setLoading(true);
     setDashboardError(null);
     try {
-      const [tradeData, summaryData] = await Promise.all([fetchTrades(), fetchSummary()]);
+      const [tradeData, summaryData, monthlyData] = await Promise.all([
+        fetchTrades(),
+        fetchSummary(),
+        fetchMonthlyPnL(),
+      ]);
       setTrades(tradeData);
       setSummary(summaryData);
+      setMonthlyPnL(monthlyData);
     } catch (err) {
       setDashboardError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -130,6 +139,7 @@ export default function TrackPnlApp() {
     setSessionState(null);
     setTrades([]);
     setSummary(null);
+    setMonthlyPnL([]);
     setShowModal(false);
     setDropdownOpen(false);
   }, []);
@@ -411,6 +421,13 @@ export default function TrackPnlApp() {
               color="#FFBE0B"
             />
           </div>
+        </div>
+      )}
+
+      {/* Monthly Chart */}
+      {monthlyPnL.length > 0 && (
+        <div className="mt-5">
+          <MonthlyChart data={monthlyPnL} />
         </div>
       )}
 
